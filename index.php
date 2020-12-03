@@ -11,7 +11,7 @@ function unpacker($string)
     $resultArr = [];
     $slashFlag = false;
 
-    for($i = 0; $i <= count($arr) + 1; $i++) {
+    for($i = 0; $i <= count($arr); $i++) {
 
         if ($slashFlag) {
             $previousItem = $arr[$i];
@@ -112,7 +112,7 @@ function packer ($string)
     $resultArr = [];
     $counter = 1;
 
-    for($i = 0; $i <= count($arr) + 1; $i++) {
+    for($i = 0; $i <= count($arr); $i++) {
         if ($previousItem === $arr[$i]) {
             $counter++;
             continue;
