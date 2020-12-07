@@ -6,40 +6,31 @@ function unpacker(String $string) :String
         throw new Exception(sprintf ('Строка %s состоит из цифр', $string));
     }
 
-    $arr = mb_str_split($string);
     $previousItem = null;
     $result = null;
     $slashFlag = false;
-    $arrLength = count($arr);
+    $strLength = strlen($string);
 
-    for($i = 0; $i <= $arrLength; $i++) {
+    for($i = 0; $i <= $strLength; $i++) {
 
-        if (isset($arr[$i])) {
+        if (isset($string[$i]) || $previousItem) {
             if ($slashFlag) {
-                $previousItem = $arr[$i];
+                $previousItem = $string[$i];
                 $slashFlag = false;
                 continue;
-            } elseif ($arr[$i] == '\\') {
+            } elseif ($string[$i] == '\\') {
                 $slashFlag = true;
             }
 
-            if (is_numeric($arr[$i])) {
-                if ($previousItem) {
-                    for ($j = 0; $j < $arr[$i]; $j++) {
-                        $result .= $previousItem;
-                    }
-                    $previousItem = '';
-                } else {
-                    continue;
-                }
-            } else {
-                if ($previousItem) {
+            if (is_numeric($string[$i])) {
+                for ($j = 0; $j < $string[$i]; $j++) {
                     $result .= $previousItem;
                 }
-                $previousItem = $arr[$i];
+                $previousItem = null;
+            } else {
+                $result .= $previousItem;
+                $previousItem = $string[$i] ?? $previousItem;
             }
-        } else {
-            $result .= $previousItem;
         }
     }
     return $result;
@@ -113,14 +104,13 @@ EOD;
 
 function packer (String $string) :String
 {
-    $arr = mb_str_split($string);
     $previousItem = null;
     $result= null;
     $counter = 1;
-    $arrLength =  count($arr);
+    $strLength = strlen($string);
 
-    for($i = 0; $i <= $arrLength; $i++) {
-        if (isset($previousItem) && $previousItem === $arr[$i]) {
+    for($i = 0; $i <= $strLength; $i++) {
+        if (isset($string[$i]) && $previousItem === $string[$i]) {
             $counter++;
             continue;
         } else {
@@ -134,7 +124,7 @@ function packer (String $string) :String
             }
             $counter = 1;
         }
-        $previousItem = $arr[$i];
+        $previousItem = $string[$i] ?? $previousItem;
     }
 
     return $result;
