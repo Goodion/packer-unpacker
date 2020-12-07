@@ -1,42 +1,48 @@
 <?php
 
-function unpacker($string)
+function unpacker(String $string) :String
 {
     if (is_numeric($string)) {
         throw new Exception(sprintf ('Строка %s состоит из цифр', $string));
     }
 
-    $arr = str_split($string);
+    $arr = mb_str_split($string);
     $previousItem = null;
-    $resultArr = [];
+    $result = null;
     $slashFlag = false;
+    $arrLength = count($arr);
 
-    for($i = 0; $i <= count($arr); $i++) {
+    for($i = 0; $i <= $arrLength; $i++) {
 
-        if ($slashFlag) {
-            $previousItem = $arr[$i];
-            $slashFlag = ! $slashFlag;
-            continue;
-        } elseif ($arr[$i] == '\\') {
-            $slashFlag = ! $slashFlag;
-        }
-
-        if (is_numeric($arr[$i])) {
-            if ($previousItem) {
-                $resultArr += array_fill(count($resultArr), $arr[$i], $previousItem);
-                $previousItem = '';
-            } else {
+        if (isset($arr[$i])) {
+            if ($slashFlag) {
+                $previousItem = $arr[$i];
+                $slashFlag = false;
                 continue;
+            } elseif ($arr[$i] == '\\') {
+                $slashFlag = true;
+            }
+
+            if (is_numeric($arr[$i])) {
+                if ($previousItem) {
+                    for ($j = 0; $j < $arr[$i]; $j++) {
+                        $result .= $previousItem;
+                    }
+                    $previousItem = '';
+                } else {
+                    continue;
+                }
+            } else {
+                if ($previousItem) {
+                    $result .= $previousItem;
+                }
+                $previousItem = $arr[$i];
             }
         } else {
-            if ($previousItem) {
-                $resultArr[] = $previousItem;
-            }
-            $previousItem = $arr[$i];
+            $result .= $previousItem;
         }
     }
-
-    return implode('', $resultArr);
+    return $result;
 }
 
 
@@ -105,32 +111,33 @@ $str16 = <<<'EOD'
 \\\\\a
 EOD;
 
-function packer ($string)
+function packer (String $string) :String
 {
-    $arr = str_split($string);
+    $arr = mb_str_split($string);
     $previousItem = null;
-    $resultArr = [];
+    $result= null;
     $counter = 1;
+    $arrLength =  count($arr);
 
-    for($i = 0; $i <= count($arr); $i++) {
-        if ($previousItem === $arr[$i]) {
+    for($i = 0; $i <= $arrLength; $i++) {
+        if (isset($previousItem) && $previousItem === $arr[$i]) {
             $counter++;
             continue;
         } else {
             if (is_numeric($previousItem) || $previousItem === '\\') {
-                $resultArr[] = '\\';
+                $result .= '\\';
             }
 
-            $resultArr[] = $previousItem;
+            $result .= $previousItem;
             if ($counter !== 1) {
-                $resultArr[] = $counter;
+                $result .= $counter;
             }
             $counter = 1;
         }
         $previousItem = $arr[$i];
     }
 
-    return implode('', $resultArr);
+    return $result;
 }
 
 var_dump(packer($str8));
