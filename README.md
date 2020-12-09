@@ -5,7 +5,7 @@ Examples:
 
 * "a4bc2d5e" => "aaaabccddddde"
 * "abcd" => "abcd"
-* "45" => "" (некорректная строка)
+* "45" => "" (incorrect string)
 * "" => ""
 * `qwe\4\5` => `qwe45`
 * `qwe\45` => `qwe44444`
